@@ -1,0 +1,175 @@
+<?php
+session_start();
+require_once('lib/connect.inc.php');
+require_once('lib/lib.inc.php');
+$IdUser = $_SESSION['id'];
+
+setlocale(LC_TIME, 'ru_RU.utf8');
+//echo strftime('%w', strtotime('26.10.2019'));
+
+$ArrMount = array("01"=>"Январь",
+"02"=>"Февраль",
+"03"=>"Март",
+"04"=>"Апрель",
+"05"=>"Май",
+"06"=>"Июнь",
+"07"=>"Июль",
+"08"=>"Август",
+"09"=>"Сентябрь",
+"10"=>"Октябрь",
+"11"=>"Ноябрь",
+"12"=>"Декабрь"
+);
+
+
+?>
+<!DOCTYPE html>
+  <head>
+    <title>Табель</title>
+    <meta name="keywords" content="" />
+  <meta name="description" content="" />
+    <!-- 
+    Polygon Template
+    https://templatemo.com/tm-400-polygon
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/templatemo_misc.css">
+    <link href="css/templatemo_style.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,600' rel='stylesheet' type='text/css'>
+    <!--<script src="js/validator.min.js"></script>-->
+      
+    <script src="js/jquery-1.10.2.min.js"></script> 
+  <script src="js/jquery.lightbox.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="style/bootstrap/css/bootstrap-theme.min.css">
+
+
+      <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+      <script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+     <!-- <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
+      <script src='style/bootstrap-tags-master/dist/js/bootstrap-tags.js'></script>
+      <link rel="stylesheet" type="text/css" href="style/bootstrap-tags-master/dist/css/bootstrap-tags.css" />
+
+ 
+
+
+  </head>
+  <body>
+
+ 
+            
+
+
+ <ul class="nav nav-tabs">
+  <div class="col-sm-3 col-md-3 col-lg-3">
+        <li class="nav-item">
+            <div class="templatemo_form">
+      <button class="btn btn-primary nav-link" type="button" data-toggle="tab" href="#object">Объекты</button>
+  </div>
+
+    </li>
+  </div>  
+  <div class="col-sm-3 col-md-3 col-lg-3">  
+    <li class="nav-item">
+            <div class="templatemo_form">
+      <button class="btn btn-primary nav-link" type="button" data-toggle="tab" href="#stock">Склад</button>
+  </div>
+
+    </li>
+  </div>
+    <div class="col-sm-3 col-md-3 col-lg-3">
+    <li class="nav-item">
+            <div class="templatemo_form">
+      <button class="btn btn-primary nav-link" type="button" data-toggle="tab" href="#work">Работы</button>
+    </div>
+
+
+    </li>
+  </div>
+  <div class="col-sm-3 col-md-3 col-lg-3">
+    <li class="nav-item">
+            <div class="templatemo_form">
+      <button class="btn btn-primary nav-link" type="button" data-toggle="tab" href="#inst">Инструмент</button>
+    </div>
+
+
+    </li>
+  </div>
+  </ul>
+
+<div class="tab-content">
+
+      <div id="object" class="tab-pane active">
+   <?php
+    include('object.php');
+   ?>
+</div>
+
+    <div id="stock" class="tab-pane">
+   <?php
+    include('addstock.php');
+   ?>
+</div>
+  <div id="work" class="tab-pane">
+    <?php
+     include('work.php');
+    ?>
+
+</div>
+
+  <div id="inst" class="tab-pane">
+    <?php
+     include('inst.php');
+    ?>
+
+</div>
+
+
+            </div>
+  
+
+
+
+<?php
+
+
+
+
+?>
+
+
+
+              <div class="row">
+
+        </div>
+      
+    <!-- contact end -->
+  
+      <!-- footer end -->    
+  <script>
+
+
+
+
+      </script>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+
+<script>
+    
+    $(document).ready(function(){
+        $("#myModalBox").modal('show');
+    });
+
+</script>
+  <!-- templatemo 400 polygon -->
+  </body>
+</html>

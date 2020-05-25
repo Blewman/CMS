@@ -1,0 +1,816 @@
+
+<style type="text/css">
+         .modal-content {
+  font-family: Tahoma, Arial; 
+  padding: 0px; 
+  margin: 0px; 
+  color: #e7e7e7;
+  background: #393e42;
+  font-size: 12px;
+}
+       </style>
+   	
+<script type="text/javascript">
+  
+  function mySearch_stock() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("nameInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("classTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+  function mySearch_stock2() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("nameInput2");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("classTable2");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+function exc()
+  {
+    var table= document.getElementById("classTable2");
+    var html = table.outerHTML;
+    window.open('data:application/vnd.ms-excel, ' + '\uFEFF' + encodeURIComponent(html));
+  }
+
+function exce()
+  {
+    var table= document.getElementById("classTable");
+    var html = table.outerHTML;
+    window.open('data:application/vnd.ms-excel, ' + '\uFEFF' + encodeURIComponent(html));
+  }  
+</script>
+<?php
+
+if (!isset($_POST['select_mount_stock'])) {
+  $mount_stock = date('m');
+} else {
+  $mount_stock;
+  $year_stock;
+}
+
+if (!isset($_POST['select_year_stock'])) {
+  $year_stock = date('Y');
+} else {
+   $year_stock;
+   $mount_stock;
+}
+
+
+?>  
+
+<div class="templatemo_form">
+  <div class="col-lg-3 col-sm-3 col-md-12 col-xs-12">
+    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#addstock">Добавить работы</button>
+  </div>
+</div>
+<div class="col-lg-3 col-sm-3 col-md-12 col-xs-12" style="padding-left: 40px;">
+  <div class="templatemo_form" >
+   <form action="" method="POST" id="form_mount_stock">
+      <select class="selectpicker" id="select_mount_stock">
+        <?php
+        $select_mount_name = "SELECT * FROM monthname";
+        $result_mount_name = $connectionPDO->query($select_mount_name);
+        foreach ($result_mount_name as $key_mount_name => $value_mount_name) { 
+          if ($value_mount_name['kodMonth'] == $mount_stock) {
+              $selected = "selected";
+          } 
+          else {
+                $selected = "";
+                 } 
+        ?>
+          <option class="btn" value="<?=$value_mount_name['kodMonth']?>" <?=$selected?>><?=$value_mount_name['NameMonth']?></option>
+        <?php
+          
+        }
+        ?>  
+            }
+      </select>
+    </form>
+  </div>
+</div>
+
+<!--<div class="col-lg-3 col-sm-3 col-md-12 col-xs-12">
+  <div class="templatemo_form" >
+   <form action="" method="POST" id="form_year_stock">
+      <select class="selectpicker" id="select_year_stock">
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+      </select>
+    </form>
+  </div>
+</div>-->
+
+<script type="text/javascript">
+  
+  $("#select_mount_stock").change(function(){
+
+   var select_mount_stock = $("#select_mount_stock").val();
+   //  var itemdlj = $("#itemdlj<?=$valuedlj['id']?>").val();
+     //var EditTextDlj = $("#EditTextDlj<?=$valuedlj['id']?>").val();
+   // alert(select_mount_stock);
+    
+   $.ajax({
+        url: 'lib/obrstoke.php',
+        type: 'POST',
+        cache: false,
+        data:{ 'select_mount_stock':select_mount_stock},
+        dataType: 'html',
+        success:
+      function(html){
+            $("#stock").html(html);
+        }
+    });
+
+  
+});
+
+
+  $("#select_year_stock").change(function(){
+
+   var select_year_stock = $("#select_year_stock").val();
+   //var select_mount_stock_year = $("#select_mount_stock").val();
+   //  var itemdlj = $("#itemdlj<?=$valuedlj['id']?>").val();
+     //var EditTextDlj = $("#EditTextDlj<?=$valuedlj['id']?>").val();
+    //alert(select_mount_stock);
+    
+   $.ajax({
+        url: 'lib/obrstoke.php',
+        type: 'POST',
+        cache: false,
+        data:{ 'select_year_stock':select_year_stock},
+        dataType: 'html',
+        success:
+      function(html){
+            $("#stock").html(html);
+        }
+    });
+
+  
+});
+
+</script>
+<!--<div class="templatemo_form">
+  <div class="col-lg-3 col-sm-3 col-md-12 col-xs-12">
+    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#addmater">Материал</button>
+  </div>
+</div>-->
+       
+
+<div class="col-md-3 col-sm-12 col-lg-12" >
+
+  <table class="table table-responsive">
+    <thead>
+        <tr><th width="20"></th><th width="20">Дата</th><th>Объект</th><th colspan="<?=count_span()?>">Виды работ</th></tr>
+    </thead>
+    <tbody>
+      <?php
+         $sql_select_project = "SELECT DAY(st.datN) AS day_prj, COUNT(st.datN) AS kols, st.datN AS DTN, st.idStok AS name_prj, st.id  AS sid, s.name
+        FROM recstok AS st
+        INNER JOIN stock AS s
+        ON st.idStok = s.id
+        WHERE MONTH(datN) = '".$mount_stock."' 
+        AND YEAR(datN) = '".$year_stock."'  
+        GROUP BY datN
+        ";
+        $resutl_project = $connectionPDO -> query($sql_select_project) or die('Ошибка при выполнении запроса выборки');
+
+        foreach ($resutl_project as $key_project => $value_project) {
+
+            ?>
+      <?php
+            $projectedit1[]['id'] = $value_project['day_prj'];
+            
+
+
+        if ($value_project['kols'] > 1) {
+     
+      
+      ?> 
+        <tr>
+          <td>
+            <i class="element<?=$key_project?> fa fa-plus clickable" data-toggle="collapse" data-target="#group-of-rows-<?=$value_project['sid']?>" aria-expanded="false" aria-controls="group-of-rows-2" aria-hidden="true" onclick='$(".element<?=$key_project?>").toggleClass("fa fa-plus fa fa-minus");'></i>
+          </td>
+
+           <?php
+           } else {
+            ?>
+
+        <tr class="">
+          <td>
+            <i class="" aria-hidden="true"></i>
+          </td>
+
+            <?php
+
+           }
+
+           ?>  
+            <td>
+              <?=$value_project['day_prj'];?>
+            </td>
+            <td data-toggle="modal" data-target="#editproject<?=$value_project['day_prj']?>">
+              <?=$value_project['name'];?>
+            </td>
+            <?php
+              $sql_select_namestok = "SELECT * FROM namestok WHERE idrecstok = ".$value_project['sid']."";
+              $resutl_namestok = $connectionPDO -> query($sql_select_namestok) or die('Ошибка при выполнении запроса выборки');
+                foreach ($resutl_namestok as $key_namestok => $value_namestok) {
+
+            ?>
+            <td>
+              <?=$value_namestok['name']?>
+            </td>
+        
+              <?php
+               }
+              ?>
+        </tr>
+      </tbody>
+      <tbody id="group-of-rows-<?=$value_project['sid']?>" class="collapse">
+          <?php
+            $sql_select_project2 = "SELECT DAY(st.datN) AS dnachs, st.idStok, st.id, s.name  
+              FROM recstok AS st
+              INNER JOIN stock AS s
+              ON st.idStok = s.id 
+              WHERE st.datN = '".$value_project['datN']."' AND st.id != '".$value_project['sid']."' ";
+            $resutl_project2 = $connectionPDO -> query($sql_select_project2) or die('Ошибка при выполнении запроса выборки');
+              foreach ($resutl_project2 as $key_project2 => $value_project2) {
+
+            $projectedit2[]['id'] = $value_project2['idStok'];
+              ?>
+             
+        <tr>
+          <td></td>
+          <td data-toggle="modal" data-target="#editproject<?=$value_project2['idStok']?>"><?=$value_project2['dnachs']?></td>
+          <td data-toggle="modal" data-target="#editproject<?=$value_project2['idStok']?>"><?=$value_project2['name']?></td>
+          <?php
+            $sql_select_namestok = "SELECT * FROM namestok WHERE idrecstok = ".$value_project2['id']."";
+            $resutl_namestok = $connectionPDO -> query($sql_select_namestok) or die('Ошибка при выполнении запроса выборки');
+              foreach ($resutl_namestok as $key_namestok => $value_namestok) {
+            ?>
+          <td><?=$value_namestok['name']?></td>
+            <?php
+            }
+              $sql_select_work2 = "SELECT * FROM recstok WHERE idStok = ".$value_project2['id']."";
+              $resutl_work2 = $connectionPDO -> query($sql_select_work2) or die('Ошибка при выполнении запроса выборки');
+               foreach ($resutl_work2 as $key_work2 => $value_work2) {
+            ?>
+            <?php
+            }
+            ?>
+        </tr>
+         <?php
+          }
+          ?> 
+      </tbody>     
+          <?php
+           }
+          ?>
+  </table>
+
+
+<?php
+if (count($projectedit1) != 0) {
+
+  foreach ($projectedit1 as $keyprojectedit1 => $valueprojectedit1) {
+
+    $sql_projectedit1 = "SELECT * FROM stock WHERE id = '".$valueprojectedit1['id']."' ";
+    $resutl_projectedit1 = $connectionPDO -> query($sql_projectedit1) or die('');
+    
+    //$itog = $resutl_projectedit1 -> fetch();
+
+    //echo $resutl_projectedit['name'];
+?>
+ 
+  <div id="editproject<?=$valueprojectedit1['id']?>" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+    <div class="modal-content templatemo_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          ×
+        </button>
+        <h4 class="modal-title" id="classModalLabel">
+              <?php print_r($valueprojectedit1);?>
+            </h4>
+      </div>
+
+      <div class="modal-body templatemo_form">
+         
+<div class="row"> 
+        <div class="col-sx-1 col-md-1 col-lg-1">
+              <button class="btn btn-primary" data-toggle="modal" data-target="#addmat<?=$valueprojectedit1['id']?>">+</button>
+        </div>
+        <div class="col-sx-11 col-md-11 col-lg-11">      
+              <input name="nameInput" type="text" class="form-control" id="nameInput" onkeyup="mySearch_stock()" placeholder="Поиск" maxlength="40">
+         </div>  
+</div>   
+         <div class="row">    
+<div class="col-sx-12 col-md-12 col-lg-12" style="margin-left: -15px" >
+        <table id="classTable" class="table table-bordered" border="1">
+          <thead>
+            <tr>
+              <th>№ п/п</th>
+              <th>Дата поступления</th>
+              <th>Наименование</th>
+              <th>Е.Изм.</th>
+              <th>Кол-во</th>
+              <th>Стоимость</th>
+              <th>Файл</th>
+              <th>Примечание </th>
+            </tr>
+          </thead>
+          <tbody>
+              <?php
+            $select_mater = "SELECT * FROM recstokmater WHERE idrecstok = '".$valueprojectedit1['id']."'";
+            $result_mater = $connectionPDO->query($select_mater);
+            $j = 1;
+            foreach ($result_mater as $key_mater => $value_mater) {
+          
+            ?>
+            <tr>
+                <td><?=$j++;?></td>
+                <td><?=$value_mater['dat']?></td>
+                <td><?=$value_mater['name']?></td>
+                <td><?=$value_mater['edizm']?></td>
+                <td><?=$value_mater['kolvo']?></td>
+                <td><?=$value_mater['summ']?></td>
+                <td>Файл</td>
+                <td><?=$value_mater['koment']?> </td>
+              </tr>
+            <?php
+
+              }
+
+            ?>
+          </tbody>
+        </table>
+      </div>
+      </div>
+      <div class="modal-footer templatemo_form">
+        <button type="button" class="btn btn-primary" onclick="exce()">
+          Выгрузить
+        </button>
+  
+    </div>
+  </div>
+  </div>
+</div>
+</div>
+
+<!--Добавляем материал-->
+<div id="addmat<?=$valueprojectedit1['id']?>" class="modal" tabindex="-2" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content templatemo_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          ×
+        </button>
+        <h4 class="modal-title" id="classModalLabel">
+              <?=$itog['name']?>
+            </h4>
+      </div>
+      
+      <div class="modal-body templatemo_form">
+        <form enctype="multipart/form-data" method="POST">
+         <div class="col-sx-12 col-md-12 col-lg-12">
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="date" id="dat_add_mater<?=$valueprojectedit1['id']?>" value="<?=date('Y-m-d')?>">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="text" id="name_add_mater<?=$valueprojectedit1['id']?>" placeholder="Наименование Товара">
+            <input type="hidden" id="id_add_mater<?=$valueprojectedit1['id']?>" value="<?=$valueprojectedit1['id']?>">
+          </div>
+          <div class="col-sx-3 col-md-3 col-lg-3">
+            <input type="text" id="edizm_add_mater<?=$valueprojectedit1['id']?>" placeholder="Ед.изм.">
+          </div>
+           <div class="col-sx-9 col-md-9 col-lg-9">
+            <input type="text" id="kolvo_add_mater<?=$valueprojectedit1['id']?>" placeholder="Количество">
+          </div>
+           <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="text" id="summ_add_mater<?=$valueprojectedit1['id']?>" placeholder="Стоимость, тнг">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="file" id="file_add_mater<?=$valueprojectedit1['id']?>" placeholder="Файл">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="text" id="komen_add_mater<?=$valueprojectedit1['id']?>" placeholder="Примечание">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+        <button type="button" class="btn btn-primary" id="addmatertab<?=$valueprojectedit1['id']?>" data-dismiss="modal">
+          Добавить
+        </button>
+      </div>
+      </div>
+      </form>
+        <div class="modal-footer templatemo_form">
+  
+    </div>
+
+      
+      </div>
+
+  </div>
+  </div>
+</div>
+<script type="text/javascript">
+
+        $("#addmatertab<?=$valueprojectedit1['id']?>").click(function(){
+
+
+  var newmater = $("#addmatertab<?=$valueprojectedit1['id']?>").val();
+
+  var dat_add_mater = $("#dat_add_mater<?=$valueprojectedit1['id']?>").val();
+  var id_add_mater = $("#id_add_mater<?=$valueprojectedit1['id']?>").val();
+  var name_add_mater = $("#name_add_mater<?=$valueprojectedit1['id']?>").val();
+  var edizm_add_mater = $("#edizm_add_mater<?=$valueprojectedit1['id']?>").val();
+  var kolvo_add_mater = $("#kolvo_add_mater<?=$valueprojectedit1['id']?>").val();
+  var summ_add_mater = $("#summ_add_mater<?=$valueprojectedit1['id']?>").val();
+  var komen_add_mater = $("#komen_add_mater<?=$valueprojectedit1['id']?>").val();
+  var file_add_mater = $("#file_add_mater<?=$valueprojectedit1['id']?>").val();
+
+
+ //alert(file_add_mater);
+ /*var add_dat_work = ("#add_dat_work").val();*/
+   
+  
+$.ajax({
+        url: 'lib/obrstoke.php',
+        type: 'POST',
+        cache: false,
+        data:{'newmater' : newmater, 'dat_add_mater' : dat_add_mater,'name_add_mater' : name_add_mater, 'edizm_add_mater' : edizm_add_mater, 'kolvo_add_mater' : kolvo_add_mater,'summ_add_mater' : summ_add_mater, 'komen_add_mater' : komen_add_mater,'  id_add_mater' : id_add_mater, 'file_add_mater' : file_add_mater},
+        dataType:'html',
+        success:alert('Запись успешно добавлена!'),
+      function(html){
+            $("#stock").html(html);          
+        }
+    });
+
+ //$("#addmat<?=$valueprojectedit1['id']?>").modal('hide');
+ 
+});
+
+      </script>
+
+
+<?php
+  }
+}
+
+if (count($projectedit2) != 0) {
+  $j = 1;
+  foreach ($projectedit2 as $keyprojectedit2 => $valueprojectedit2) {
+
+    $sql_projectedit2 = "SELECT * FROM stock WHERE id = '".$valueprojectedit2['id']."' ";
+    $resutl_projectedit2 = $connectionPDO -> query($sql_projectedit2) or die('');
+    
+    $itog = $resutl_projectedit2 -> fetch();
+
+    //echo $resutl_projectedit['name'];
+?>
+ 
+<div id="editproject<?=$valueprojectedit2['id']?>" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content templatemo_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          ×
+        </button>
+        <h4 class="modal-title" id="classModalLabel">
+              <?=$itog['name']?>
+            </h4>
+      </div>
+
+  <div class="modal-body templatemo_form">
+    <div class="row"> 
+      <div class="col-sx-1 col-md-1 col-lg-1">
+          <button class="btn btn-primary" data-toggle="modal" data-target="#addmat<?=$valueprojectedit2['id']?>">+</button>
+      </div>
+      <div class="col-sx-11 col-md-11 col-lg-11">      
+        <input name="nameInput2" type="text" class="form-control" id="nameInput2" onkeyup="mySearch_stock2()" placeholder="Поиск" maxlength="40">
+      </div>  
+    </div>  
+    <div class="row">
+      <div class="col-sx-12 col-md-12 col-lg-12" style="margin-left: -15px" >   
+        <table id="classTable2" class="table table-bordered" border="1">
+          <thead>    
+            <tr>
+              <th>№ п/п</th>
+              <th>Дата поступления</th>
+              <th>Наименование</th>
+              <th>Е.Изм.</th>
+              <th>Кол-во</th>
+              <th>Стоимость</th>
+              <th>Файл</th>
+              <th>Примечание </th>
+            </tr>
+          </thead>
+          <tbody>
+                      <?php
+                      $select_mater = "SELECT * FROM recstokmater WHERE idrecstok = '".$valueprojectedit2['id']."'";
+                      $result_mater = $connectionPDO->query($select_mater);
+                      foreach ($result_mater as $key_mater => $value_mater) {
+                    
+                      ?>
+                      <tr>
+                        <td><?=$j++;?></td>
+                        <td><?=$value_mater['dat']?></td>
+                        <td><?=$value_mater['name']?></td>
+                        <td><?=$value_mater['edizm']?></td>
+                        <td><?=$value_mater['kolvo']?></td>
+                        <td><?=$value_mater['summ']?></td>
+                        <td>Файл</td>
+                        <td><?=$value_mater['koment']?> </td>
+                      </tr>
+                      <?php
+
+                        }
+
+                      ?>
+            </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer templatemo_form">
+        <button type="button" class="btn btn-primary" onclick="exc()" > Выгрузить</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!--Добавляем материал-->
+<div id="addmat<?=$valueprojectedit2['id']?>" class="modal" tabindex="-2" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content templatemo_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          ×
+        </button>
+        <h4 class="modal-title" id="classModalLabel">
+              <?=$itog['name']?>
+            </h4>
+      </div>
+      
+      <div class="modal-body templatemo_form">
+        <form method="POST">
+         <div class="col-sx-12 col-md-12 col-lg-12">
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="date" id="dat_add_mater<?=$valueprojectedit2['id']?>" value="<?=date('Y-m-d')?>">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="text" id="name_add_mater<?=$valueprojectedit2['id']?>" placeholder="Наименование Товара">
+            <input type="hidden" id="id_add_mater<?=$valueprojectedit2['id']?>" value="<?=$valueprojectedit2['id']?>">
+          </div>
+          <div class="col-sx-3 col-md-3 col-lg-3">
+            <input type="text" id="edizm_add_mater<?=$valueprojectedit2['id']?>" placeholder="Ед.изм.">
+          </div>
+           <div class="col-sx-9 col-md-9 col-lg-9">
+            <input type="text" id="kolvo_add_mater<?=$valueprojectedit2['id']?>" placeholder="Количество">
+          </div>
+           <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="text" id="summ_add_mater<?=$valueprojectedit2['id']?>" placeholder="Стоимость, тнг">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="file" id="file_add_mater<?=$valueprojectedit2['id']?>" placeholder="Файл">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+            <input type="text" id="komen_add_mater<?=$valueprojectedit2['id']?>" placeholder="Примечание">
+          </div>
+          <div class="col-sx-12 col-md-12 col-lg-12">
+        <button type="button" class="btn btn-primary" id="addmatertab<?=$valueprojectedit2['id']?>" data-dismiss="modal">
+          Добавить
+        </button>
+      </div>
+      </div>
+      </form>
+        <div class="modal-footer templatemo_form">
+  
+        </div>
+
+      
+      </div>
+
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+
+        $("#addmatertab<?=$valueprojectedit2['id']?>").click(function(){
+
+
+  var newmater = $("#addmatertab<?=$valueprojectedit2['id']?>").val();
+
+  var dat_add_mater = $("#dat_add_mater<?=$valueprojectedit2['id']?>").val();
+  var id_add_mater = $("#id_add_mater<?=$valueprojectedit2['id']?>").val();
+  var name_add_mater = $("#name_add_mater<?=$valueprojectedit2['id']?>").val();
+  var edizm_add_mater = $("#edizm_add_mater<?=$valueprojectedit2['id']?>").val();
+  var kolvo_add_mater = $("#kolvo_add_mater<?=$valueprojectedit2['id']?>").val();
+  var summ_add_mater = $("#summ_add_mater<?=$valueprojectedit2['id']?>").val();
+  var komen_add_mater = $("#komen_add_mater<?=$valueprojectedit2['id']?>").val();
+
+ //alert(worksstock);
+ /*var add_dat_work = ("#add_dat_work").val();*/
+   
+  
+$.ajax({
+        url: 'lib/obrstoke.php',
+        type: 'POST',
+        cache: false,
+        data:{newmater, dat_add_mater,name_add_mater,edizm_add_mater,kolvo_add_mater,summ_add_mater,komen_add_mater,id_add_mater},
+        dataType:'html',
+        success:alert('Запись успешно добавлена!'),
+      function(html){
+            $("#stock").html(html);
+        }
+    });
+
+ //$("#addmat<?=$valueprojectedit1['id']?>").modal('hide');
+ 
+});
+</script>
+
+
+
+<?php
+  }
+}
+
+?>
+  <div class="modal" id='addstock' tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-body">
+        <div class="col-sx-12 col-md-12 col-lg-12">
+          <form role="formstock" method="POST">
+            <div class="col-md-12 col-lg-12">        
+              <div class="templatemo_form">
+                <select  id="addstockwork" class="form-control"> 
+                  <?php
+                    $sql_select_objectlis = "SELECT s.id AS sid, s.name AS sname  FROM stock AS s WHERE status = 0";
+                    $result_select_objectlis = $connectionPDO -> query($sql_select_objectlis );
+                    foreach ($result_select_objectlis as $keyobjectlis => $valueobjectlis) {      
+                  ?>
+                  <option value="<?=$valueobjectlis['sid']?>"><?=$valueobjectlis['sname']?></option>
+                  <?php
+                    }
+                  ?>
+                </select>
+              </div>
+            </div>
+            <div class="col-sx-12 col-md-12 col-lg-12">
+              <div class="templatemo_form">
+                <input type="date" id="adddatstock" placeholder="" value="<?=date('Y-m-d')?>">
+              </div>
+            </div>
+            <div class="col-sx-12 col-md-12 col-lg-12">
+              <div class="templatemo_form">
+                <input type="text" class="form-control" id="worksstock" name="worksstock" placeholder="Виды работ">
+              </div>  
+            </div>
+            <div class="col-sx-12 col-md-12 col-lg-12">
+              <div class="templatemo_form">
+                <button type="button" class="btn btn-primary" id="newstock" data-dismiss="modal">Добавить</button>
+              </div>
+            </div>
+          </form>        
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    
+    $("#newstock").click(function(){
+     var newstock = $("#newstock").val();
+      var worksstock = $("#worksstock").val();
+      var adddatstock = $("#adddatstock").val();
+      var addstockwork = $("#addstockwork").val(); 
+        $.ajax({
+                url: 'lib/obrstoke.php',
+                type: 'POST',
+                cache: false,
+                data:{'newstock' : newstock, 'worksstock' : worksstock,'adddatstock':adddatstock,'addstockwork':addstockwork},
+                dataType:'html',
+                success:
+              function(html){
+                    $("#stock").html(html);
+                }
+            });
+    alert('Запись успешно добавлена!');
+    });
+
+  </script>
+
+
+<script type="text/javascript">
+$(function()
+{
+    $(document).ready(function(){
+        var fvrhtmlclone3 = '<div class="fvrclonned3">'+$(".fvrduplicate3").html()+'</div>';
+        $( ".fvrduplicate3" ).html(fvrhtmlclone3);
+        $( ".fvrduplicate3" ).after('<div class="fvrclone3"></div>');
+
+        $(document).on('click', '.btn-add3', function(e)
+        {
+            e.preventDefault();
+    
+            $( ".fvrclone3" ).append(fvrhtmlclone3);
+                  $(this).removeClass('btn-add3').addClass('btn-remove')
+                .removeClass('btn-success').addClass('btn-danger')
+                .html('<span class="glyphicon glyphicon-minus"></span>');
+            
+        }).on('click', '.btn-remove', function(e)
+        {
+            $(this).parents('.fvrclonned3').remove();
+    
+        e.preventDefault();
+        return false;
+      });
+
+    });
+
+        
+  function showValues() {
+    var fields = $( ":input" ).serializeArray();
+    $( "#results" ).empty();
+    jQuery.each( fields, function( i, field ) {
+      $( "#results" ).append( field.value + " " );
+    });
+  }    
+    
+    $( "formstock" ).submit(function( event ) {
+      showValues();
+      console.log( $( this ).serializeArray() );
+      event.preventDefault();
+    });    
+
+});
+</script>
+
+<!--Добавляем материал-->
+    <div id="addmater" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="classInfo" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content templatemo_form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h4 class="modal-title" id="classModalLabel"><?=$itog['name']?></h4>
+            </div>
+            <div class="modal-body templatemo_form">
+              <div class="col-sx-12 col-md-12 col-lg-12">
+                  <div class="col-sx-12 col-md-12 col-lg-12">
+                    <input type="date" name="">
+                  </div>
+                  <div class="col-sx-12 col-md-12 col-lg-12">
+                      <input type="text" name="" placeholder="Наименование Товара">
+                  </div>
+                  <div class="col-sx-3 col-md-3 col-lg-3">
+                     <input type="text" name="" placeholder="Ед.изм.">
+                  </div>
+                  <div class="col-sx-9 col-md-9 col-lg-9">
+                      <input type="text" name="" placeholder="Количество">
+                  </div>
+                  <div class="col-sx-12 col-md-12 col-lg-12">
+                       <input type="text" name="" placeholder="Стоимость, тнг">
+                  </div>
+                  <div class="col-sx-12 col-md-12 col-lg-12">
+                     <input type="file" name="" placeholder="Файл">
+                  </div>
+                  <div class="col-sx-12 col-md-12 col-lg-12">
+                      <input type="text" name="" placeholder="Примечание">
+                  </div>
+                  <div class="col-sx-12 col-md-12 col-lg-12">
+                     <button type="button" class="btn btn-primary" >Добавить</button>
+                  </div>
+              </div>
+            </div> 
+            <div class="modal-footer templatemo_form"></div>    
+        </div>
+      </div>
+      </div>
+ 
+</tr>
+</tbody>
+</table>
+</div>

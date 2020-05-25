@@ -1,0 +1,26 @@
+﻿<table class="display table table-hover table-bordered" id="itog" border="1">
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Дата</th>
+                <th>IP</th>
+                <th>Учетная запись</th>
+                <th>HostName</th>
+                <th>Телефон</th>
+              </tr>
+            </thead>
+                        <tbody>  
+              
+<tr class="odd gradeA">
+                <td>149</td>
+                <td>2019-12-27</td>
+                <td>10.42.2.41</td>
+                <td>Suleimenova_SAK</td>
+                <td>KSTNZHS0115</td>
+                <td>--------</td>
+  </tr>                
+       
+     
+            </tbody>
+
+</table>
